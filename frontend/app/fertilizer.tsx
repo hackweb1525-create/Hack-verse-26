@@ -15,6 +15,7 @@ import { useLocalSearchParams } from "expo-router";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
+import { useVoiceInput } from "../src/useVoiceInput";
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
 
