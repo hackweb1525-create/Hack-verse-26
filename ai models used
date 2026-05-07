@@ -1,0 +1,33 @@
+The "Brain" (Gemini 1.5 Flash API):
+
+   * **Use:** Disease detection (Vision) and Multilingual Reasoning.
+   * **Key:** Get from Google AI Studio. It is free for up to 15 requests per minute.
+Weather (OpenWeatherMap API):
+
+   * **Use:** 5-day localized data.
+   * **Key:** OpenWeather API Portal.
+Voice (Bhashini or Google TTS/STT):
+
+   * **Use:** To talk in Kannada, Hindi, etc.
+   * **Extension:** Use the google_ml_kit or speech_to_text flutter package.
+Search (Google Custom Search API):
+
+   * **Use:** Finding Govt Schemes.
+   * **Key:** Google Cloud Console. 100 queries/day for free.
+Videos (YouTube Data API v3):
+
+   * **Use:** Fetching the solution video for diseases.
+## 4. Smart Calculator Logic (The "Why/Why Not" Engine)
+
+
+core interface flow  ore Interface:** > 1. A central, pulsating **Microphone Button** that supports Speech-to-Text in Kannada, Hindi, Telugu, Tamil, and English.
+> 2. A 6-button grid below the mic, each with a large, high-contrast icon.
+> **Features & Logic:**
+>  * **Button 1 (Disease Detection):** Use Gemini 1.5 Flash Vision. Input: Image. Output: Identify disease + search YouTube Data API for a solution video + extract step-by-step text instructions from the video description/LLM knowledge.
+>  * **Button 2 (Govt Schemes & Seed Bank):** Use Google Custom Search API to find the latest .gov.in agriculture schemes. Use Google Maps API to locate the nearest "Seed Bank" or "Krishi Vigyan Kendra" based on Geo-location.
+>  * **Button 3 (Organic Fertilizer Guide):** An LLM-powered chat interface. Users ask "How to grow tomatoes organically?" via voice. Output: Non-pesticide recipes.
+>  * **Button 4 (Weather):** Call OpenWeatherMap API for a 5-day forecast (Temp, Rain probability, Humidity).
+>  * **Button 5 (Smart Calculator):** Form input for Land Size (Acres/Guntas). Logic: Use Location + Season to recommend crops. Use LLM reasoning to explain "Why this crop" and "Why NOT other crops" (e.g., "Soil too acidic for X").
+>  * **Button 6 (Market):** A simple url_launcher redirect to [Your Provided Link].
+> **Global Rule:** Every text output must be automatically converted to speech in the user's selected language using a TTS engine.
+## 2. The UI Layout (Farmer-Centric Design)  make the ui an interactive agriculture related ui in terface which  is interactive  | Disease | 🍃 + 🔍 | Red | Camera opens -> AI analyzes -> Shows Video. |
