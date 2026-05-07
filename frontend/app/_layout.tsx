@@ -3,8 +3,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useFonts } from "expo-font";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LanguageProvider } from "../src/LanguageContext";
 import { AuthProvider, useAuth } from "../src/AuthContext";
 
@@ -34,19 +32,6 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    ...MaterialCommunityIcons.font,
-    ...Ionicons.font,
-  });
-
-  if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F9F6F0" }}>
-        <ActivityIndicator size="large" color="#2E7D32" />
-      </View>
-    );
-  }
-
   return (
     <SafeAreaProvider>
       <LanguageProvider>
