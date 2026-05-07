@@ -17,6 +17,7 @@ import { LANGUAGES, useLanguage } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
 import { useVoiceInput } from "../src/useVoiceInput";
 import { useAuth } from "../src/AuthContext";
+import { api } from "../src/api";
 
 const COLORS = {
   bg: "#F9F6F0",
@@ -32,6 +33,8 @@ export default function Home() {
   const { lang, ttsCode, t } = useLanguage();
   const { user, signOut } = useAuth();
   const [transcript, setTranscript] = useState<string>("");
+  const [aiAnswer, setAiAnswer] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
   const greetedRef = useRef<string>("");
 
   const FEATURES = [
@@ -43,9 +46,24 @@ export default function Home() {
     { key: "market", label: t("feat_market"), hint: t("feat_market_hint"), color: "#388E3C", icon: "storefront", url: process.env.EXPO_PUBLIC_MARKET_URL },
   ];
 
-  const onTranscript = (text: string) => {
+  const onTranscript = async (text: string) => {
     setTranscript(text);
-    router.push({ pathname: "/fertilizer", params: { q: text } } as any);
+    setAiAnswer("");
+    setAiLoading(true);
+    try {
+      const { data } = await api.post("/fertilizer/chat", {
+        session_id: `home-${Date.now()}`,
+        message: text,
+        language: lang,
+      });
+      const reply = data?.reply || "";
+      setAiAnswer(reply);
+      if (reply) speak(reply, ttsCode);
+    } catch (e: any) {
+      setAiAnswer(t("err_transcribe"));
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const { listening, transcribing, toggle } = useVoiceInput({ lang, onTranscript });
@@ -145,10 +163,33 @@ export default function Home() {
           {transcribing ? t("transcribing") : listening ? t("listening") : t("tap_to_speak")}
         </Text>
         {transcript ? (
-          <Text style={styles.transcriptText} testID="transcript-text" numberOfLines={2}>
+          <Text style={styles.transcriptText} testID="transcript-text" numberOfLines={3}>
             "{transcript}"
           </Text>
         ) : null}
+
+        {(aiLoading || aiAnswer) && (
+          <View style={styles.answerBox} testID="ai-answer">
+            <View style={styles.answerHeader}>
+              <Text style={styles.answerLabel}>🤖 {t("ai_answer")}</Text>
+              {aiAnswer ? (
+                <View style={{ flexDirection: "row", gap: 6 }}>
+                  <TouchableOpacity onPress={() => speak(aiAnswer, ttsCode)} style={styles.answerBtn}>
+                    <Icon name="volume-high" size={18} color="#2E7D32" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={stopSpeak} style={styles.answerBtn}>
+                    <Icon name="volume-off" size={18} color="#C62828" />
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+            </View>
+            {aiLoading ? (
+              <Text style={styles.answerText}>{t("transcribing")}...</Text>
+            ) : (
+              <Text style={styles.answerText}>{aiAnswer}</Text>
+            )}
+          </View>
+        )}
       </View>
 
       {/* Feature grid */}
@@ -190,6 +231,14 @@ const styles = StyleSheet.create({
   } as any,
   micCaption: { marginTop: 16, fontSize: 16, color: COLORS.textSecondary, fontWeight: "600" },
   transcriptText: { marginTop: 8, paddingHorizontal: 24, fontSize: 14, fontStyle: "italic", color: COLORS.mic, textAlign: "center", maxWidth: 360 },
+  answerBox: {
+    marginTop: 16, marginHorizontal: 20, backgroundColor: "#fff", borderRadius: 14, padding: 14,
+    borderLeftWidth: 4, borderLeftColor: "#2E7D32", elevation: 2, alignSelf: "stretch",
+  },
+  answerHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  answerLabel: { fontSize: 13, fontWeight: "800", color: "#2E7D32" },
+  answerBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#F1F8E9", alignItems: "center", justifyContent: "center" },
+  answerText: { fontSize: 15, color: "#1A2F1D", lineHeight: 22 },
   grid: { paddingHorizontal: 24, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: 14, marginTop: 8 },
   card: {
     width: "47%", minHeight: 150, borderRadius: 18, padding: 16,

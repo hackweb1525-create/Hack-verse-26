@@ -19,19 +19,21 @@ import { useVoiceInput } from "../src/useVoiceInput";
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
 
-// Remove constant STARTERS — now translated per-language inside component
-const _STARTERS_REMOVED: string[] = [];
+const ORGANIC_METHODS = [
+  { key: "compost", emoji: "🌿", titleKey: "om_compost_t", descKey: "om_compost_d", color: "#558B2F" },
+  { key: "vermicompost", emoji: "🪱", titleKey: "om_vermi_t", descKey: "om_vermi_d", color: "#6D4C41" },
+  { key: "jeevamrutha", emoji: "🐄", titleKey: "om_jeev_t", descKey: "om_jeev_d", color: "#8D6E63" },
+  { key: "panchagavya", emoji: "🥛", titleKey: "om_panch_t", descKey: "om_panch_d", color: "#9CCC65" },
+  { key: "neem", emoji: "🍃", titleKey: "om_neem_t", descKey: "om_neem_d", color: "#388E3C" },
+  { key: "greenmanure", emoji: "🌱", titleKey: "om_green_t", descKey: "om_green_d", color: "#43A047" },
+];
 
 export default function Fertilizer() {
-  const { lang, ttsCode } = useLanguage();
+  const { lang, ttsCode, t } = useLanguage();
   const params = useLocalSearchParams<{ q?: string }>();
   const sessionId = useRef(`s-${Date.now()}`).current;
   const [messages, setMessages] = useState<Msg[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "",
-    },
+    { id: "welcome", role: "assistant", content: "" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,10 +44,16 @@ export default function Fertilizer() {
     lang,
     onTranscript: (text) => {
       setInput(text);
-      // Auto-send transcribed voice
       send(text);
     },
   });
+
+  // Translated welcome message
+  useEffect(() => {
+    setMessages((m) =>
+      m.map((msg) => (msg.id === "welcome" ? { ...msg, content: t("ferti_welcome") } : msg)),
+    );
+  }, [lang, t]);
 
   const send = async (text?: string) => {
     const msg = (text ?? input).trim();
@@ -63,10 +71,10 @@ export default function Fertilizer() {
       const aiMsg: Msg = { id: `a-${Date.now()}`, role: "assistant", content: data.reply };
       setMessages((m) => [...m, aiMsg]);
       speak(data.reply, ttsCode);
-    } catch (e: any) {
+    } catch {
       setMessages((m) => [
         ...m,
-        { id: `e-${Date.now()}`, role: "assistant", content: "Sorry, I couldn't reach the server. Please try again." },
+        { id: `e-${Date.now()}`, role: "assistant", content: t("err_transcribe") },
       ]);
     } finally {
       setLoading(false);
@@ -74,12 +82,10 @@ export default function Fertilizer() {
     }
   };
 
-  // Show translated welcome message
-  useEffect(() => {
-    setMessages((m) =>
-      m.map((msg) => (msg.id === "welcome" ? { ...msg, content: t("ferti_welcome") } : msg)),
-    );
-  }, [lang, t]);
+  const askMethod = (titleKey: string) => {
+    const q = `${t("how_to_make")} ${t(titleKey)}? ${t("tell_steps")}`;
+    send(q);
+  };
 
   // Auto-send if voice transcript was passed via ?q=
   useEffect(() => {
@@ -102,39 +108,55 @@ export default function Fertilizer() {
         contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
         testID="chat-scroll"
       >
-        {messages.map((m) => (
-          <View
-            key={m.id}
-            testID={`msg-${m.role}`}
-            style={[
-              styles.bubble,
-              m.role === "user" ? styles.userBubble : styles.aiBubble,
-            ]}
-          >
-            <Text style={[styles.bubbleText, m.role === "user" && { color: "#fff" }]}>
-              {m.content}
-            </Text>
-            {m.role === "assistant" && m.id !== "welcome" && (
-              <TouchableOpacity onPress={() => speak(m.content, ttsCode)} style={styles.speakIcon}>
-                <Icon name="volume-high" size={18} color="#795548" />
-              </TouchableOpacity>
-            )}
-          </View>
-        ))}
+        {/* Welcome bubble */}
+        {messages.map((m, i) =>
+          m.id === "welcome" || i > 0 ? (
+            <View
+              key={m.id}
+              testID={`msg-${m.role}`}
+              style={[styles.bubble, m.role === "user" ? styles.userBubble : styles.aiBubble]}
+            >
+              <Text style={[styles.bubbleText, m.role === "user" && { color: "#fff" }]}>
+                {m.content}
+              </Text>
+              {m.role === "assistant" && m.id !== "welcome" && (
+                <TouchableOpacity onPress={() => speak(m.content, ttsCode)} style={styles.speakIcon}>
+                  <Icon name="volume-high" size={18} color="#795548" />
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : null,
+        )}
+
+        {/* 6 Organic fertilizer methods (only shown before chat starts) */}
+        {messages.length <= 1 && (
+          <>
+            <Text style={styles.sectionTitle}>{t("top_organic")}</Text>
+            <Text style={styles.sectionSub}>{t("tap_to_learn")}</Text>
+            <View style={styles.methodsGrid}>
+              {ORGANIC_METHODS.map((m) => (
+                <TouchableOpacity
+                  key={m.key}
+                  testID={`method-${m.key}`}
+                  onPress={() => askMethod(m.titleKey)}
+                  style={[styles.methodCard, { borderColor: m.color }]}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.methodEmoji}>{m.emoji}</Text>
+                  <Text style={[styles.methodTitle, { color: m.color }]}>{t(m.titleKey)}</Text>
+                  <Text style={styles.methodDesc} numberOfLines={3}>
+                    {t(m.descKey)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text style={styles.orAsk}>{t("or_ask_below")}</Text>
+          </>
+        )}
+
         {loading && (
           <View style={[styles.bubble, styles.aiBubble]}>
             <ActivityIndicator color="#795548" />
-          </View>
-        )}
-
-        {messages.length <= 1 && (
-          <View style={styles.starters}>
-            <Text style={styles.startersTitle}>{t("try_asking")}</Text>
-            {STARTERS.map((s) => (
-              <TouchableOpacity key={s} testID={`starter-${s.slice(0, 10)}`} style={styles.starterBtn} onPress={() => send(s)}>
-                <Text style={styles.starterText}>{s}</Text>
-              </TouchableOpacity>
-            ))}
           </View>
         )}
       </ScrollView>
@@ -178,11 +200,26 @@ const styles = StyleSheet.create({
   aiBubble: { backgroundColor: "#fff", alignSelf: "flex-start", elevation: 1 },
   bubbleText: { fontSize: 15, lineHeight: 22, color: "#1A2F1D" },
   speakIcon: { marginTop: 6 },
-  starters: { marginTop: 8 },
-  startersTitle: { fontSize: 13, color: "#888", marginBottom: 8 },
-  starterBtn: { backgroundColor: "#FFF3E0", padding: 12, borderRadius: 10, marginBottom: 8 },
-  starterText: { color: "#5D4037", fontSize: 14, fontWeight: "600" },
-  inputRow: { flexDirection: "row", alignItems: "center", padding: 10, gap: 8, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#EEE" },
+  sectionTitle: { fontSize: 18, fontWeight: "800", color: "#1A2F1D", marginTop: 14, marginBottom: 4 },
+  sectionSub: { fontSize: 13, color: "#666", marginBottom: 10 },
+  methodsGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
+  methodCard: {
+    width: "48%",
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    borderWidth: 2,
+    padding: 12,
+    marginBottom: 10,
+    minHeight: 130,
+  },
+  methodEmoji: { fontSize: 28 },
+  methodTitle: { fontSize: 15, fontWeight: "800", marginTop: 6 },
+  methodDesc: { fontSize: 12, color: "#4A5D4E", marginTop: 4, lineHeight: 16 },
+  orAsk: { fontSize: 13, color: "#666", marginTop: 14, marginBottom: 4, fontStyle: "italic", textAlign: "center" },
+  inputRow: {
+    flexDirection: "row", alignItems: "center", padding: 10, gap: 8,
+    backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#EEE",
+  },
   input: { flex: 1, fontSize: 15, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#F5F5F5", borderRadius: 22, maxHeight: 100, color: "#1A2F1D" },
   stopBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#FFE0B2", alignItems: "center", justifyContent: "center" },
   micChatBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#2E7D32", alignItems: "center", justifyContent: "center" },
