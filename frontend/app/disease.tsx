@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
@@ -89,11 +89,11 @@ export default function Disease() {
 
       <View style={styles.row}>
         <TouchableOpacity testID="btn-camera" style={[styles.actionBtn, { backgroundColor: "#D32F2F" }]} onPress={() => pick(true)}>
-          <MaterialCommunityIcons name="camera" size={24} color="#fff" />
+          <Icon name="camera" size={24} color="#fff" />
           <Text style={styles.actionText}>Camera</Text>
         </TouchableOpacity>
         <TouchableOpacity testID="btn-gallery" style={[styles.actionBtn, { backgroundColor: "#455A64" }]} onPress={() => pick(false)}>
-          <MaterialCommunityIcons name="image-multiple" size={24} color="#fff" />
+          <Icon name="image-multiple" size={24} color="#fff" />
           <Text style={styles.actionText}>Gallery</Text>
         </TouchableOpacity>
       </View>
@@ -112,7 +112,7 @@ export default function Disease() {
           <ActivityIndicator color="#fff" />
         ) : (
           <>
-            <MaterialCommunityIcons name="magnify-scan" size={24} color="#fff" />
+            <Icon name="magnify-scan" size={24} color="#fff" />
             <Text style={styles.actionText}>Analyze with AI</Text>
           </>
         )}
@@ -127,7 +127,7 @@ export default function Disease() {
           <Text style={styles.summary}>{result.summary}</Text>
 
           <TouchableOpacity onPress={() => speak(result.summary, ttsCode)} style={styles.ttsBtn}>
-            <MaterialCommunityIcons name="volume-high" size={20} color="#2E7D32" />
+            <Icon name="volume-high" size={20} color="#2E7D32" />
             <Text style={styles.ttsText}>Listen</Text>
           </TouchableOpacity>
 
@@ -139,7 +139,7 @@ export default function Disease() {
             >
               <Image source={{ uri: result.video.thumbnail }} style={styles.videoThumb} />
               <View style={styles.playOverlay}>
-                <MaterialCommunityIcons name="play-circle" size={56} color="#fff" />
+                <Icon name="play-circle" size={56} color="#fff" />
               </View>
               <Text style={styles.videoTitle} numberOfLines={2}>{result.video.title}</Text>
             </TouchableOpacity>

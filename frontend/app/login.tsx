@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { useAuth } from "../src/AuthContext";
 import { LANGUAGES, useLanguage, LangCode } from "../src/LanguageContext";
 
@@ -55,7 +55,7 @@ export default function Login() {
           {/* Hero */}
           <View style={styles.hero}>
             <View style={styles.logoWrap}>
-              <MaterialCommunityIcons name="leaf" size={56} color="#fff" />
+              <Icon name="leaf" size={56} color="#fff" />
             </View>
             <Text style={styles.brand}>AgriMind AI</Text>
             <Text style={styles.tag}>Your voice-first farming companion</Text>
@@ -70,7 +70,7 @@ export default function Login() {
 
             <Text style={styles.label}>Your Name</Text>
             <View style={styles.inputRow}>
-              <MaterialCommunityIcons name="account" size={22} color="#4A5D4E" />
+              <Icon name="account" size={22} color="#4A5D4E" />
               <TextInput
                 testID="login-name"
                 value={name}
@@ -83,7 +83,7 @@ export default function Login() {
 
             <Text style={styles.label}>Mobile Number</Text>
             <View style={styles.inputRow}>
-              <MaterialCommunityIcons name="phone" size={22} color="#4A5D4E" />
+              <Icon name="phone" size={22} color="#4A5D4E" />
               <Text style={styles.cc}>+91</Text>
               <TextInput
                 testID="login-phone"
@@ -122,7 +122,7 @@ export default function Login() {
               style={[styles.cta, submitting && { opacity: 0.6 }]}
             >
               <Text style={styles.ctaText}>Continue</Text>
-              <MaterialCommunityIcons name="arrow-right-circle" size={26} color="#fff" />
+              <Icon name="arrow-right-circle" size={26} color="#fff" />
             </TouchableOpacity>
 
             <Text style={styles.privacy}>
@@ -146,7 +146,7 @@ export default function Login() {
 function Hint({ icon, text }: { icon: any; text: string }) {
   return (
     <View style={styles.hint}>
-      <MaterialCommunityIcons name={icon} size={20} color="#2E7D32" />
+      <Icon name={icon} size={20} color="#2E7D32" />
       <Text style={styles.hintText}>{text}</Text>
     </View>
   );

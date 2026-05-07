@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { api } from "../src/api";
 
 type Day = {
@@ -15,7 +15,7 @@ type Day = {
   condition: string;
 };
 
-const ICON_MAP: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+const ICON_MAP: Record<string, string> = {
   sun: "weather-sunny",
   cloud: "weather-cloudy",
   "cloud-rain": "weather-pouring",
@@ -66,7 +66,7 @@ export default function Weather() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 20 }}>
       <View style={styles.locRow}>
-        <MaterialCommunityIcons name="map-marker" size={22} color="#0288D1" />
+        <Icon name="map-marker" size={22} color="#0288D1" />
         <Text style={styles.locText}>{location}</Text>
       </View>
       <Text style={styles.heading}>5-Day Forecast</Text>
@@ -79,14 +79,14 @@ export default function Weather() {
               <Text style={styles.dayDate}>{i === 0 ? "Today" : d.date}</Text>
               <Text style={styles.dayCond}>{d.condition}</Text>
             </View>
-            <MaterialCommunityIcons name={iconName} size={48} color="#0288D1" />
+            <Icon name={iconName} size={48} color="#0288D1" />
             <View style={styles.dayRight}>
               <Text style={styles.tempMax}>{d.temp_max}°</Text>
               <Text style={styles.tempMin}>/{d.temp_min}°C</Text>
               <View style={styles.metaRow}>
-                <MaterialCommunityIcons name="water-percent" size={14} color="#4A5D4E" />
+                <Icon name="water-percent" size={14} color="#4A5D4E" />
                 <Text style={styles.metaText}>{d.humidity}%</Text>
-                <MaterialCommunityIcons name="weather-rainy" size={14} color="#4A5D4E" />
+                <Icon name="weather-rainy" size={14} color="#4A5D4E" />
                 <Text style={styles.metaText}>{d.rain_prob}%</Text>
               </View>
             </View>

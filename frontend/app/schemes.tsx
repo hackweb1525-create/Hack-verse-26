@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import * as Location from "expo-location";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { api } from "../src/api";
 
 type Scheme = { id: string; title: string; summary: string; url: string; tags: string[] };
@@ -67,7 +67,7 @@ export default function Schemes() {
           onPress={() => Linking.openURL(s.url)}
         >
           <View style={styles.schemeHeader}>
-            <MaterialCommunityIcons name="bank" size={26} color="#1976D2" />
+            <Icon name="bank" size={26} color="#1976D2" />
             <Text style={styles.schemeTitle}>{s.title}</Text>
           </View>
           <Text style={styles.schemeSummary}>{s.summary}</Text>
@@ -83,14 +83,14 @@ export default function Schemes() {
       <Text style={styles.section}>🏛️ Nearest Seed Banks & KVKs</Text>
       {mapsUrl ? (
         <TouchableOpacity testID="open-maps" onPress={() => Linking.openURL(mapsUrl)} style={styles.mapBtn}>
-          <MaterialCommunityIcons name="map-marker-radius" size={22} color="#fff" />
+          <Icon name="map-marker-radius" size={22} color="#fff" />
           <Text style={styles.mapBtnText}>Open in Google Maps</Text>
         </TouchableOpacity>
       ) : null}
 
       {banks.map((b, i) => (
         <View key={i} style={styles.bankCard} testID={`seedbank-${i}`}>
-          <MaterialCommunityIcons name="warehouse" size={28} color="#2E7D32" />
+          <Icon name="warehouse" size={28} color="#2E7D32" />
           <View style={{ flex: 1, marginLeft: 12 }}>
             <Text style={styles.bankName}>{b.name}</Text>
             <Text style={styles.bankMeta}>{b.type} · {b.distance_km} km</Text>

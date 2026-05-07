@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
 import { speak } from "../src/tts";
@@ -86,7 +86,7 @@ export default function Calculator() {
             onPress={voiceToggle}
             style={[styles.voiceBtn, voiceListening && { backgroundColor: "#C62828" }]}
           >
-            <MaterialCommunityIcons
+            <Icon
               name={voiceListening ? "stop" : voiceTranscribing ? "dots-horizontal" : "microphone"}
               size={22}
               color="#fff"
@@ -152,7 +152,7 @@ export default function Calculator() {
             <ActivityIndicator color="#fff" />
           ) : (
             <>
-              <MaterialCommunityIcons name="calculator-variant" size={22} color="#fff" />
+              <Icon name="calculator-variant" size={22} color="#fff" />
               <Text style={styles.submitText}>Get Crop Recommendations</Text>
             </>
           )}

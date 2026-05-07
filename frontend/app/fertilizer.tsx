@@ -10,7 +10,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { useLocalSearchParams } from "expo-router";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
@@ -114,7 +114,7 @@ export default function Fertilizer() {
             </Text>
             {m.role === "assistant" && m.id !== "welcome" && (
               <TouchableOpacity onPress={() => speak(m.content, ttsCode)} style={styles.speakIcon}>
-                <MaterialCommunityIcons name="volume-high" size={18} color="#795548" />
+                <Icon name="volume-high" size={18} color="#795548" />
               </TouchableOpacity>
             )}
           </View>
@@ -153,17 +153,17 @@ export default function Fertilizer() {
           onPress={toggle}
           style={[styles.micChatBtn, listening && { backgroundColor: "#C62828" }]}
         >
-          <MaterialCommunityIcons
+          <Icon
             name={listening ? "stop" : transcribing ? "dots-horizontal" : "microphone"}
             size={22}
             color="#fff"
           />
         </TouchableOpacity>
         <TouchableOpacity testID="btn-stop-tts" onPress={stopSpeak} style={styles.stopBtn}>
-          <MaterialCommunityIcons name="volume-off" size={22} color="#795548" />
+          <Icon name="volume-off" size={22} color="#795548" />
         </TouchableOpacity>
         <TouchableOpacity testID="btn-send" onPress={() => send()} style={styles.sendBtn} disabled={loading}>
-          <MaterialCommunityIcons name="send" size={22} color="#fff" />
+          <Icon name="send" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

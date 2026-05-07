@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../src/Icon";
 import { LANGUAGES, useLanguage, LangCode } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
 import { useVoiceInput } from "../src/useVoiceInput";
@@ -32,7 +32,7 @@ const FEATURES: {
   label: string;
   hint: string;
   color: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: string;
   route?: string;
   url?: string;
 }[] = [
@@ -129,7 +129,7 @@ export default function Home() {
           </Text>
         </View>
         <TouchableOpacity onPress={confirmSignOut} style={styles.profileBtn} testID="profile-btn">
-          <MaterialCommunityIcons name="account-circle" size={36} color="#2E7D32" />
+          <Icon name="account-circle" size={36} color="#2E7D32" />
         </TouchableOpacity>
       </View>
 
@@ -162,7 +162,7 @@ export default function Home() {
           style={[styles.micBtn, listening && { backgroundColor: "#C62828" }]}
           testID="pulsating-mic-button"
         >
-          <MaterialCommunityIcons
+          <Icon
             name={listening ? "stop-circle" : transcribing ? "dots-horizontal" : "microphone"}
             size={64}
             color="#fff"
@@ -188,7 +188,7 @@ export default function Home() {
             onPress={() => handleFeature(f)}
             style={[styles.card, { backgroundColor: f.color }]}
           >
-            <MaterialCommunityIcons name={f.icon} size={48} color="#fff" />
+            <Icon name={f.icon} size={48} color="#fff" />
             <Text style={styles.cardLabel}>{f.label}</Text>
             <Text style={styles.cardHint}>{f.hint}</Text>
           </TouchableOpacity>
