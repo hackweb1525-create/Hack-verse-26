@@ -1,4 +1,10 @@
 # Hack-verse-26
+  TEAM :  TECH Express
+  LEADER :R SUDHANVA
+  MEMBER 2 : TANISHK KUMAR SG
+  MEMBER 3 : SIVA KUMARI
+  MEMBER 4 : mohamad sheik afzal
+
 ai for social impact tools built
 tool: # FarmAssist AI
 ### Voice-First Agricultural Assistant for Smart Farming
