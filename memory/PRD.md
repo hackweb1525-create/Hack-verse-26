@@ -1,39 +1,64 @@
 # AgriMind AI — PRD
 
 ## Overview
-AgriMind AI is a voice-first multilingual mobile assistant (Expo React Native) for Indian farmers with low digital literacy. Powered by Gemini 2.5 Flash via the Emergent Universal LLM key.
+AgriMind AI is a voice-first multilingual mobile assistant (Expo React Native) for Indian farmers with low digital literacy. Powered by Gemini 2.5 Flash + OpenAI Whisper-1 via the Emergent Universal LLM key.
 
 ## Languages
-English, Hindi, Kannada, Telugu, Tamil. Default English. Selectable via top-of-screen pill bar; persists in app context.
+English, Hindi, Kannada, Telugu, Tamil. Default English. Selectable on the login page (persisted) and via top-of-screen pill bar on the home page.
+
+## Authentication / Onboarding
+- Simple farmer-friendly **login page** (no password): Name + 10-digit Mobile + Preferred Language.
+- Stored locally via `AsyncStorage` (no backend auth, no JWT).
+- Auth gate in `_layout.tsx` redirects unauthenticated users to `/login`.
+- Sign-out via tap on profile icon on home.
 
 ## Tech Stack
-- Frontend: Expo SDK 54, expo-router (file-based routing), React Native, expo-speech (TTS), expo-image-picker, expo-location, axios
-- Backend: FastAPI + Motor (MongoDB) + emergentintegrations (Gemini 2.5 Flash)
+- **Frontend**: Expo SDK 54, expo-router, React Native, expo-speech (TTS), **expo-audio** (recording), expo-image-picker, expo-location, axios, AsyncStorage
+- **Backend**: FastAPI + Motor (MongoDB) + emergentintegrations (Gemini 2.5 Flash + OpenAI Whisper-1)
 
-## Screens / Features
-| # | Screen | Color | Backend endpoint |
-|---|--------|-------|------------------|
-| Home | `/` (mic + 6-grid + language) | Green primary | n/a |
-| 1 | Disease Detection (`/disease`) | Red | `POST /api/disease/detect` (Gemini Vision) |
-| 2 | Govt Schemes & Seed Bank (`/schemes`) | Blue | `GET /api/schemes`, `GET /api/seedbanks` (MOCKED) |
-| 3 | Organic Fertilizer chat (`/fertilizer`) | Brown | `POST /api/fertilizer/chat` (Gemini, persisted in MongoDB) |
-| 4 | 5-day Weather (`/weather`) | Sky Blue | `GET /api/weather` (MOCKED) |
-| 5 | Smart Crop Calculator (`/calculator`) | Orange | `POST /api/calculator/recommend` (Gemini reasoning) |
-| 6 | Market | Green | External `Linking.openURL("https://farm-link-chat.lovable.app/")` |
+## Voice (full pipeline)
+**Speech-to-Text:**
+- **Web preview** → browser's free Web Speech API with BCP-47 language code (`en-IN`, `hi-IN`, `kn-IN`, `te-IN`, `ta-IN`).
+- **Native (Expo Go on phone)** → records via `expo-audio`, base64 → backend `POST /api/stt` → OpenAI Whisper-1 → transcript.
 
-## TTS / Voice
-Every AI text reply is auto-spoken via `expo-speech` using language code (`en-IN`, `hi-IN`, `kn-IN`, `te-IN`, `ta-IN`). Manual replay & Stop buttons provided.
+**Text-to-Speech:**
+- Every AI reply is auto-spoken via `expo-speech` in the user's selected language code.
 
-STT (microphone-in) requires a development build (`@react-native-voice/voice` not available in Expo Go). The pulsating mic button currently provides voice-out greeting + a graceful prompt to use feature buttons; full STT can be enabled in a dev build.
+**Voice mic locations:**
+- Home: large pulsating mic → transcript routes to fertilizer chat with question pre-filled and auto-sent.
+- Fertilizer chat: dedicated mic next to the text input (auto-sends transcript).
+- Calculator: voice button on the location field.
 
-## MOCKED integrations (replace with real keys later)
-- `/api/weather` — replace with OpenWeatherMap API key
-- `/api/youtube/search` — replace with YouTube Data API v3 key
-- `/api/seedbanks` — replace with Google Maps Places API
-- `/api/schemes` — currently a curated verified list; can be made live via Google Custom Search
+## Backend Endpoints
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/` | Health |
+| GET | `/api/languages` | Supported languages |
+| POST | `/api/disease/detect` | Gemini Vision disease detection |
+| POST | `/api/fertilizer/chat` | Multilingual organic-farming chat |
+| GET | `/api/fertilizer/history/{session_id}` | Chat history |
+| POST | `/api/calculator/recommend` | Crop suggestions with reasoning |
+| POST | `/api/translate` | Translate text → target language |
+| POST | `/api/stt` | OpenAI Whisper-1 transcription |
+| GET | `/api/weather` | 5-day forecast (MOCKED) |
+| GET | `/api/schemes` | Govt schemes list (MOCKED — curated) |
+| GET | `/api/seedbanks` | Nearby seed banks (MOCKED) |
+| GET | `/api/youtube/search` | Disease video lookup (MOCKED) |
 
-## Smart Calculator Logic
-Sends `location, land_size, unit, season, soil_type, language` to Gemini. JSON response: 3 suggested crops with success reason / yield / water need + 2 rejected crops with failure reasons.
+## Screens
+| Route | Color theme | Notes |
+|-------|-------------|-------|
+| `/login` | Green hero | Onboarding form |
+| `/` (home) | Light bg | Mic + 6-card grid + profile |
+| `/disease` | Red | Image upload → Gemini Vision result + steps |
+| `/schemes` | Blue | Schemes + seed-bank list + Google Maps link |
+| `/fertilizer` | Brown | Voice + text chat with history |
+| `/weather` | Sky Blue | 5-day forecast cards |
+| `/calculator` | Orange | Form with voice for location |
+| External | Green | `https://farm-link-chat.lovable.app/` |
 
-## Data
-MongoDB stores `chat_messages` for fertilizer guide history.
+## MOCKED integrations (replace with keys)
+- OpenWeatherMap (`/api/weather`)
+- YouTube Data API v3 (`/api/youtube/search`)
+- Google Maps Places (`/api/seedbanks`)
+- Google Custom Search (`/api/schemes` — currently curated verified list)

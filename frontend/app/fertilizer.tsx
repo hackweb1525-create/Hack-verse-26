@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
@@ -26,6 +27,7 @@ const STARTERS = [
 
 export default function Fertilizer() {
   const { lang, ttsCode } = useLanguage();
+  const params = useLocalSearchParams<{ q?: string }>();
   const sessionId = useRef(`s-${Date.now()}`).current;
   const [messages, setMessages] = useState<Msg[]>([
     {
@@ -38,6 +40,16 @@ export default function Fertilizer() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const autoSentRef = useRef(false);
+
+  const { listening, transcribing, toggle } = useVoiceInput({
+    lang,
+    onTranscript: (text) => {
+      setInput(text);
+      // Auto-send transcribed voice
+      send(text);
+    },
+  });
 
   const send = async (text?: string) => {
     const msg = (text ?? input).trim();
@@ -65,6 +77,16 @@ export default function Fertilizer() {
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     }
   };
+
+  // Auto-send if voice transcript was passed via ?q=
+  useEffect(() => {
+    const q = (params?.q || "").toString().trim();
+    if (q && !autoSentRef.current) {
+      autoSentRef.current = true;
+      send(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params?.q]);
 
   return (
     <KeyboardAvoidingView
@@ -125,6 +147,17 @@ export default function Fertilizer() {
           multiline
           onSubmitEditing={() => send()}
         />
+        <TouchableOpacity
+          testID="btn-mic"
+          onPress={toggle}
+          style={[styles.micChatBtn, listening && { backgroundColor: "#C62828" }]}
+        >
+          <MaterialCommunityIcons
+            name={listening ? "stop" : transcribing ? "dots-horizontal" : "microphone"}
+            size={22}
+            color="#fff"
+          />
+        </TouchableOpacity>
         <TouchableOpacity testID="btn-stop-tts" onPress={stopSpeak} style={styles.stopBtn}>
           <MaterialCommunityIcons name="volume-off" size={22} color="#795548" />
         </TouchableOpacity>
@@ -149,5 +182,6 @@ const styles = StyleSheet.create({
   inputRow: { flexDirection: "row", alignItems: "center", padding: 10, gap: 8, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#EEE" },
   input: { flex: 1, fontSize: 15, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#F5F5F5", borderRadius: 22, maxHeight: 100, color: "#1A2F1D" },
   stopBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#FFE0B2", alignItems: "center", justifyContent: "center" },
+  micChatBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#2E7D32", alignItems: "center", justifyContent: "center" },
   sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#795548", alignItems: "center", justifyContent: "center" },
 });

@@ -15,6 +15,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { api } from "../src/api";
 import { useLanguage } from "../src/LanguageContext";
 import { speak } from "../src/tts";
+import { useVoiceInput } from "../src/useVoiceInput";
 
 type Suggested = { crop: string; reason: string; yield_estimate: string; water_need: string };
 type Rejected = { crop: string; reason: string };
@@ -32,6 +33,12 @@ export default function Calculator() {
   const [season, setSeason] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+
+  const { listening: voiceListening, transcribing: voiceTranscribing, toggle: voiceToggle } =
+    useVoiceInput({
+      lang,
+      onTranscript: (text) => setLocation(text),
+    });
 
   const submit = async () => {
     if (!location.trim() || !land.trim()) {
@@ -65,14 +72,27 @@ export default function Calculator() {
         <Text style={styles.subtitle}>Get AI-powered crop suggestions based on your land, season & soil.</Text>
 
         <Text style={styles.label}>📍 Location (district/state)</Text>
-        <TextInput
-          testID="input-location"
-          value={location}
-          onChangeText={setLocation}
-          placeholder="e.g. Belgaum, Karnataka"
-          placeholderTextColor="#999"
-          style={styles.input}
-        />
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <TextInput
+            testID="input-location"
+            value={location}
+            onChangeText={setLocation}
+            placeholder="e.g. Belgaum, Karnataka"
+            placeholderTextColor="#999"
+            style={[styles.input, { flex: 1 }]}
+          />
+          <TouchableOpacity
+            testID="btn-voice-location"
+            onPress={voiceToggle}
+            style={[styles.voiceBtn, voiceListening && { backgroundColor: "#C62828" }]}
+          >
+            <MaterialCommunityIcons
+              name={voiceListening ? "stop" : voiceTranscribing ? "dots-horizontal" : "microphone"}
+              size={22}
+              color="#fff"
+            />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>📏 Land size</Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -173,6 +193,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: "#4A5D4E", marginTop: 4, marginBottom: 16 },
   label: { fontSize: 14, fontWeight: "700", color: "#4A5D4E", marginTop: 14, marginBottom: 6 },
   input: { backgroundColor: "#fff", borderRadius: 10, padding: 14, fontSize: 15, color: "#1A2F1D", borderWidth: 1, borderColor: "#EEE" },
+  voiceBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: "#F57C00", alignItems: "center", justifyContent: "center" },
   unitWrap: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 10, overflow: "hidden", borderWidth: 1, borderColor: "#EEE" },
   unitBtn: { paddingHorizontal: 14, justifyContent: "center" },
   unitText: { fontSize: 14, fontWeight: "700", color: "#4A5D4E" },

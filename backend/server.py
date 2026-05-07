@@ -12,7 +12,10 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
+import base64
+import io
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from emergentintegrations.llm.openai import OpenAISpeechToText
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -83,6 +86,12 @@ class CalculatorRequest(BaseModel):
     season: Optional[str] = None
     soil_type: Optional[str] = None
     language: str = "en"
+
+
+class STTRequest(BaseModel):
+    audio_base64: str
+    language: str = "en"
+    mime: str = "audio/m4a"  # m4a default for iOS, webm for web, etc.
 
 
 # ===== Routes =====
@@ -250,6 +259,49 @@ async def translate(req: TranslateRequest):
         return {"text": out.strip()}
     except Exception:
         return {"text": req.text}
+
+
+# ----- Speech-to-Text (Whisper) -----
+def _ext_for(mime: str) -> str:
+    m = (mime or "").lower()
+    if "m4a" in m or "mp4" in m or "aac" in m:
+        return "m4a"
+    if "webm" in m or "ogg" in m:
+        return "webm"
+    if "wav" in m:
+        return "wav"
+    if "mpeg" in m or "mp3" in m:
+        return "mp3"
+    return "m4a"
+
+
+@api_router.post("/stt")
+async def stt(req: STTRequest):
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(500, "LLM key not configured")
+    try:
+        audio_bytes = base64.b64decode(req.audio_base64)
+        if len(audio_bytes) < 200:
+            raise HTTPException(400, "Audio too short or empty")
+
+        ext = _ext_for(req.mime)
+        buf = io.BytesIO(audio_bytes)
+        buf.name = f"clip.{ext}"
+
+        client = OpenAISpeechToText(api_key=EMERGENT_LLM_KEY)
+        kwargs = {"file": buf, "model": "whisper-1", "response_format": "json"}
+        # Whisper accepts ISO-639-1 codes
+        if req.language and req.language != "auto":
+            kwargs["language"] = req.language
+
+        resp = await client.transcribe(**kwargs)
+        text = getattr(resp, "text", "") or ""
+        return {"text": text.strip(), "language": req.language}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("stt failed")
+        raise HTTPException(500, f"Transcription failed: {e}")
 
 
 # ===== MOCKED endpoints (clearly marked) =====
