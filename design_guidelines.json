@@ -1,0 +1,131 @@
+{
+  "project_name": "AgriMind AI",
+  "app_type": "React Native Expo Mobile App",
+  "theme_and_archetype": {
+    "theme": "Light",
+    "archetype": "Organic & Earthy",
+    "description": "Earthy, trustworthy, and highly accessible agricultural feel. Designed for low digital literacy with extreme visual clarity, large touch targets, and high contrast."
+  },
+  "colors": {
+    "background": "#F9F6F0",
+    "surface": "#FFFFFF",
+    "text_primary": "#1A2F1D",
+    "text_secondary": "#4A5D4E",
+    "mic_primary": "#2E7D32",
+    "mic_pulse_ring": "rgba(46, 125, 50, 0.3)",
+    "feature_buttons": {
+      "disease": {
+        "id": "disease",
+        "background": "#D32F2F",
+        "text": "#FFFFFF",
+        "label": "Disease Detection",
+        "icon": "leaf-off"
+      },
+      "schemes": {
+        "id": "schemes",
+        "background": "#1976D2",
+        "text": "#FFFFFF",
+        "label": "Govt Schemes",
+        "icon": "bank"
+      },
+      "fertilizer": {
+        "id": "fertilizer",
+        "background": "#795548",
+        "text": "#FFFFFF",
+        "label": "Fertilizer Guide",
+        "icon": "sprout"
+      },
+      "weather": {
+        "id": "weather",
+        "background": "#0288D1",
+        "text": "#FFFFFF",
+        "label": "Weather",
+        "icon": "weather-partly-cloudy"
+      },
+      "calculator": {
+        "id": "calculator",
+        "background": "#F57C00",
+        "text": "#FFFFFF",
+        "label": "Smart Calculator",
+        "icon": "calculator"
+      },
+      "market": {
+        "id": "market",
+        "background": "#388E3C",
+        "text": "#FFFFFF",
+        "label": "Market",
+        "icon": "storefront"
+      }
+    }
+  },
+  "typography": {
+    "h1": {
+      "fontSize": 28,
+      "fontWeight": "800",
+      "lineHeight": 34,
+      "color": "#1A2F1D",
+      "letterSpacing": 0.5
+    },
+    "h2": {
+      "fontSize": 22,
+      "fontWeight": "700",
+      "lineHeight": 28,
+      "color": "#1A2F1D"
+    },
+    "button_label": {
+      "fontSize": 18,
+      "fontWeight": "700",
+      "color": "#FFFFFF",
+      "textAlign": "center"
+    },
+    "body": {
+      "fontSize": 18,
+      "fontWeight": "500",
+      "lineHeight": 26,
+      "color": "#4A5D4E"
+    }
+  },
+  "spacing_and_layout": {
+    "screen_padding": 24,
+    "grid_gap": 16,
+    "border_radius_card": 16,
+    "border_radius_mic": 100,
+    "touch_target_min_height": 80,
+    "icon_size_grid": 48,
+    "icon_size_mic": 64
+  },
+  "components": {
+    "pulsating_mic": {
+      "layout": "Centered horizontally at the top/middle of the screen.",
+      "styles": "Large circular button (minWidth 120, minHeight 120, borderRadius 60). Use React Native Animated for pulsing rings expanding outwards. backgroundColor: mic_primary.",
+      "test_id": "data-testid='pulsating-mic-button'"
+    },
+    "feature_grid": {
+      "layout": "2 columns x 3 rows grid below the mic button.",
+      "styles": "Flex container with flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between'. Card width: 47%, height: 140, padding: 16, borderRadius: 16, alignItems: 'center', justifyContent: 'center'.",
+      "test_id_prefix": "data-testid='feature-card-'"
+    },
+    "language_selector": {
+      "layout": "Positioned clearly above or next to the mic button.",
+      "styles": "Pill-shaped toggle or simple horizontal ScrollView with high-contrast text tags. Selected state is bold with colored background.",
+      "test_id": "data-testid='language-selector'"
+    }
+  },
+  "screens_to_build": [
+    "/app/frontend/app/index.js",
+    "/app/frontend/app/disease.js",
+    "/app/frontend/app/schemes.js",
+    "/app/frontend/app/fertilizer.js",
+    "/app/frontend/app/weather.js",
+    "/app/frontend/app/calculator.js"
+  ],
+  "accessibility_and_testing": {
+    "touch_targets": "All touchable elements MUST have a minimum height and width of 56px to accommodate coarse interaction (low digital literacy, gloved or calloused hands).",
+    "test_ids": "Every TouchableOpacity, TextInput, and Button MUST have a 'testID' attribute (in React Native use testID instead of data-testid, although data-testid can be passed for web contexts, stick to standard RN testID).",
+    "voice_output": "Integrate Expo Speech for reading out text responses automatically."
+  },
+  "media_and_assets": {
+    "hero_image": "https://images.unsplash.com/photo-1628492058844-589eb5dc6a35?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBmYXJtZXIlMjBmaWVsZCUyMHBvcnRyYWl0fGVufDB8fHx8MTc3ODE4MjY1N3ww&ixlib=rb-4.1.0&q=85",
+    "icon_library": "@expo/vector-icons (MaterialCommunityIcons preferred for bold, clear glyphs)"
+  }
+}
