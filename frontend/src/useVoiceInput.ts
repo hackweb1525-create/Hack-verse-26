@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Platform, Alert } from "react-native";
+import {
+  useAudioRecorder,
+  RecordingPresets,
+  setAudioModeAsync,
+  requestRecordingPermissionsAsync,
+} from "expo-audio";
 import { api } from "./api";
 import { LangCode } from "./LanguageContext";
 
@@ -11,38 +17,21 @@ const langToBCP47: Record<LangCode, string> = {
   ta: "ta-IN",
 };
 
-// Lazy-load expo-audio only on native to avoid web/Expo Go init crashes
-let _audioMod: any = null;
-const loadAudio = async () => {
-  if (_audioMod) return _audioMod;
-  if (Platform.OS === "web") return null;
-  try {
-    _audioMod = await import("expo-audio");
-    return _audioMod;
-  } catch (e) {
-    console.warn("expo-audio not available", e);
-    return null;
-  }
-};
-
 export function useVoiceInput(opts: {
   lang: LangCode;
   onTranscript: (text: string) => void;
 }) {
   const { lang, onTranscript } = opts;
+  // Always-called hook (Rules of Hooks). Works on web too (no-op when unused).
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [listening, setListening] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  const recorderRef = useRef<any>(null);
   const webRecRef = useRef<any>(null);
 
-  // Pre-load audio module on native
+  // Configure audio mode once on native
   useEffect(() => {
     if (Platform.OS !== "web") {
-      loadAudio().then((mod) => {
-        if (mod?.setAudioModeAsync) {
-          mod.setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true }).catch(() => {});
-        }
-      });
+      setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true } as any).catch(() => {});
     }
   }, []);
 
@@ -96,20 +85,13 @@ export function useVoiceInput(opts: {
   // ---- Native (Whisper) path ----
   const startNative = async () => {
     try {
-      const mod = await loadAudio();
-      if (!mod) {
-        Alert.alert("Audio unavailable", "Voice input requires Expo Go or a development build.");
-        return;
-      }
-      const perm = await mod.AudioModule.requestRecordingPermissionsAsync();
+      const perm = await requestRecordingPermissionsAsync();
       if (!perm.granted) {
         Alert.alert("Permission needed", "Microphone access is required.");
         return;
       }
-      const rec = new mod.AudioRecorder(mod.RecordingPresets.HIGH_QUALITY);
-      await rec.prepareToRecordAsync();
-      rec.record();
-      recorderRef.current = rec;
+      await recorder.prepareToRecordAsync();
+      recorder.record();
       setListening(true);
     } catch (e: any) {
       console.warn("startNative failed", e);
@@ -118,13 +100,10 @@ export function useVoiceInput(opts: {
   };
 
   const stopNative = async () => {
-    const rec = recorderRef.current;
-    recorderRef.current = null;
     setListening(false);
-    if (!rec) return;
     try {
-      await rec.stop();
-      const uri = rec.uri;
+      await recorder.stop();
+      const uri = recorder.uri;
       if (!uri) return;
       setTranscribing(true);
       const resp = await fetch(uri);
@@ -145,6 +124,7 @@ export function useVoiceInput(opts: {
       if (text) onTranscript(text);
       else Alert.alert("No speech detected", "Please try again and speak clearly.");
     } catch (e: any) {
+      console.warn("stopNative failed", e);
       Alert.alert("Transcription failed", e?.response?.data?.detail || e?.message || "Try again");
     } finally {
       setTranscribing(false);

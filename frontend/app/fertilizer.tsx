@@ -19,12 +19,8 @@ import { useVoiceInput } from "../src/useVoiceInput";
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
 
-const STARTERS = [
-  "How to make organic compost at home?",
-  "Best non-pesticide spray for tomato pests?",
-  "How to grow okra organically in summer?",
-  "Natural fertilizer for paddy fields?",
-];
+// Remove constant STARTERS — now translated per-language inside component
+const _STARTERS_REMOVED: string[] = [];
 
 export default function Fertilizer() {
   const { lang, ttsCode } = useLanguage();
@@ -34,8 +30,7 @@ export default function Fertilizer() {
     {
       id: "welcome",
       role: "assistant",
-      content:
-        "🌱 Namaste! I'm AgriMind. Ask me anything about organic fertilizers, compost, or non-pesticide farming.",
+      content: "",
     },
   ]);
   const [input, setInput] = useState("");
@@ -78,6 +73,13 @@ export default function Fertilizer() {
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
     }
   };
+
+  // Show translated welcome message
+  useEffect(() => {
+    setMessages((m) =>
+      m.map((msg) => (msg.id === "welcome" ? { ...msg, content: t("ferti_welcome") } : msg)),
+    );
+  }, [lang, t]);
 
   // Auto-send if voice transcript was passed via ?q=
   useEffect(() => {
@@ -127,7 +129,7 @@ export default function Fertilizer() {
 
         {messages.length <= 1 && (
           <View style={styles.starters}>
-            <Text style={styles.startersTitle}>Try asking:</Text>
+            <Text style={styles.startersTitle}>{t("try_asking")}</Text>
             {STARTERS.map((s) => (
               <TouchableOpacity key={s} testID={`starter-${s.slice(0, 10)}`} style={styles.starterBtn} onPress={() => send(s)}>
                 <Text style={styles.starterText}>{s}</Text>
@@ -142,7 +144,7 @@ export default function Fertilizer() {
           testID="chat-input"
           value={input}
           onChangeText={setInput}
-          placeholder="Ask about organic farming..."
+          placeholder={t("ask_organic")}
           placeholderTextColor="#888"
           style={styles.input}
           multiline

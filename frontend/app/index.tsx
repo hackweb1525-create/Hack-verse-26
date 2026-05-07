@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Icon } from "../src/Icon";
-import { LANGUAGES, useLanguage, LangCode } from "../src/LanguageContext";
+import { LANGUAGES, useLanguage } from "../src/LanguageContext";
 import { speak, stopSpeak } from "../src/tts";
 import { useVoiceInput } from "../src/useVoiceInput";
 import { useAuth } from "../src/AuthContext";
@@ -24,41 +24,24 @@ const COLORS = {
   textSecondary: "#4A5D4E",
   mic: "#2E7D32",
   micPulse: "rgba(46, 125, 50, 0.25)",
-  surface: "#FFFFFF",
-};
-
-const FEATURES: {
-  key: string;
-  label: string;
-  hint: string;
-  color: string;
-  icon: string;
-  route?: string;
-  url?: string;
-}[] = [
-  { key: "disease", label: "Disease Detection", hint: "Photo → AI", color: "#D32F2F", icon: "leaf-off", route: "/disease" },
-  { key: "schemes", label: "Govt Schemes", hint: "& Seed Bank", color: "#1976D2", icon: "bank", route: "/schemes" },
-  { key: "fertilizer", label: "Fertilizer Guide", hint: "Voice chat", color: "#795548", icon: "sprout", route: "/fertilizer" },
-  { key: "weather", label: "Weather", hint: "5-Day forecast", color: "#0288D1", icon: "weather-partly-cloudy", route: "/weather" },
-  { key: "calculator", label: "Smart Calculator", hint: "Crop suggest", color: "#F57C00", icon: "calculator-variant", route: "/calculator" },
-  { key: "market", label: "Market", hint: "Sell direct", color: "#388E3C", icon: "storefront", url: process.env.EXPO_PUBLIC_MARKET_URL || "https://farm-link-chat.lovable.app/" },
-];
-
-const GREETINGS: Record<LangCode, (name: string) => string> = {
-  en: (n) => `Welcome ${n}. Tap the microphone and ask any farming question.`,
-  hi: (n) => `${n} जी, स्वागत है। माइक दबाएँ और कोई भी खेती का सवाल पूछें।`,
-  kn: (n) => `${n} ಅವರೇ, ಸುಸ್ವಾಗತ. ಮೈಕ್ ಒತ್ತಿ ಯಾವುದೇ ಕೃಷಿ ಪ್ರಶ್ನೆ ಕೇಳಿ.`,
-  te: (n) => `${n} గారు, స్వాగతం. మైక్ నొక్కి ఏ వ్యవసాయ ప్రశ్న అయినా అడగండి.`,
-  ta: (n) => `${n} அவர்களே, வரவேற்கிறோம். மைக்கை அழுத்தி எந்த விவசாய கேள்வியையும் கேளுங்கள்.`,
 };
 
 export default function Home() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { lang, setLang, ttsCode } = useLanguage();
+  const { lang, ttsCode, t } = useLanguage();
   const { user, signOut } = useAuth();
   const [transcript, setTranscript] = useState<string>("");
-  const greetedRef = useRef(false);
+  const greetedRef = useRef<string>("");
+
+  const FEATURES = [
+    { key: "disease", label: t("feat_disease"), hint: t("feat_disease_hint"), color: "#D32F2F", icon: "leaf-off", route: "/disease" },
+    { key: "schemes", label: t("feat_schemes"), hint: t("feat_schemes_hint"), color: "#1976D2", icon: "bank", route: "/schemes" },
+    { key: "fertilizer", label: t("feat_fertilizer"), hint: t("feat_fertilizer_hint"), color: "#795548", icon: "sprout", route: "/fertilizer" },
+    { key: "weather", label: t("feat_weather"), hint: t("feat_weather_hint"), color: "#0288D1", icon: "weather-partly-cloudy", route: "/weather" },
+    { key: "calculator", label: t("feat_calculator"), hint: t("feat_calculator_hint"), color: "#F57C00", icon: "calculator-variant", route: "/calculator" },
+    { key: "market", label: t("feat_market"), hint: t("feat_market_hint"), color: "#388E3C", icon: "storefront", url: process.env.EXPO_PUBLIC_MARKET_URL },
+  ];
 
   const onTranscript = (text: string) => {
     setTranscript(text);
@@ -67,14 +50,16 @@ export default function Home() {
 
   const { listening, transcribing, toggle } = useVoiceInput({ lang, onTranscript });
 
-  // Greet on first load only
+  // Greet on first load (and when language changes the first time)
   useEffect(() => {
-    if (user && !greetedRef.current) {
-      greetedRef.current = true;
-      const t = setTimeout(() => speak(GREETINGS[lang](user.name.split(" ")[0]), ttsCode), 600);
-      return () => clearTimeout(t);
+    if (user && greetedRef.current !== lang) {
+      greetedRef.current = lang;
+      const firstName = user.name.split(" ")[0];
+      const greeting = `${t("namaste")}, ${firstName}. ${t("tap_to_speak")}`;
+      const tm = setTimeout(() => speak(greeting, ttsCode), 600);
+      return () => clearTimeout(tm);
     }
-  }, [user, lang, ttsCode]);
+  }, [user, lang, ttsCode, t]);
 
   // Pulse animation
   const pulse1 = useRef(new Animated.Value(0)).current;
@@ -102,17 +87,19 @@ export default function Home() {
     await toggle();
   };
 
-  const handleFeature = (f: typeof FEATURES[number]) => {
+  const handleFeature = (f: any) => {
     if (f.url) { Linking.openURL(f.url); return; }
-    if (f.route) router.push(f.route as any);
+    if (f.route) router.push(f.route);
   };
 
   const confirmSignOut = () => {
-    Alert.alert("Sign out?", "You'll need to enter your details again.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Sign out", style: "destructive", onPress: () => signOut() },
+    Alert.alert(t("sign_out_q"), t("sign_out_msg"), [
+      { text: t("cancel"), style: "cancel" },
+      { text: t("sign_out"), style: "destructive", onPress: () => signOut() },
     ]);
   };
+
+  const currentLang = LANGUAGES.find((l) => l.code === lang);
 
   return (
     <ScrollView
@@ -125,31 +112,17 @@ export default function Home() {
         <View style={{ flex: 1 }}>
           <Text style={styles.brand}>AgriMind</Text>
           <Text style={styles.tagline}>
-            {user ? `Namaste, ${user.name.split(" ")[0]} 🌾` : "Your voice-first farming companion"}
+            {user ? `${t("namaste")}, ${user.name.split(" ")[0]} 🌾` : t("tagline")}
           </Text>
         </View>
-        <TouchableOpacity onPress={confirmSignOut} style={styles.profileBtn} testID="profile-btn">
-          <Icon name="account-circle" size={36} color="#2E7D32" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Language selector */}
-      <View testID="language-selector" style={styles.langWrap}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, gap: 10 }}>
-          {LANGUAGES.map((l) => {
-            const active = lang === l.code;
-            return (
-              <TouchableOpacity
-                key={l.code}
-                onPress={() => setLang(l.code as LangCode)}
-                testID={`lang-${l.code}`}
-                style={[styles.langPill, active && { backgroundColor: COLORS.mic, borderColor: COLORS.mic }]}
-              >
-                <Text style={[styles.langText, active && { color: "#fff", fontWeight: "800" }]}>{l.native}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        <View style={styles.headerRight}>
+          <View style={styles.langBadge}>
+            <Text style={styles.langBadgeText}>{currentLang?.native}</Text>
+          </View>
+          <TouchableOpacity onPress={confirmSignOut} style={styles.profileBtn} testID="profile-btn">
+            <Icon name="account-circle" size={36} color="#2E7D32" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Mic */}
@@ -169,7 +142,7 @@ export default function Home() {
           />
         </TouchableOpacity>
         <Text style={styles.micCaption}>
-          {transcribing ? "Transcribing..." : listening ? "Listening... Tap to stop" : "Tap to speak"}
+          {transcribing ? t("transcribing") : listening ? t("listening") : t("tap_to_speak")}
         </Text>
         {transcript ? (
           <Text style={styles.transcriptText} testID="transcript-text" numberOfLines={2}>
@@ -195,7 +168,7 @@ export default function Home() {
         ))}
       </View>
 
-      <Text style={styles.footer}>Powered by Gemini 2.5 Flash · Multilingual AI</Text>
+      <Text style={styles.footer}>{t("powered_by")}</Text>
     </ScrollView>
   );
 }
@@ -204,11 +177,11 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 24, flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   brand: { fontSize: 30, fontWeight: "900", color: COLORS.text, letterSpacing: 0.3 },
   tagline: { fontSize: 14, color: COLORS.textSecondary, marginTop: 2 },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+  langBadge: { backgroundColor: "#E8F5E9", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14 },
+  langBadgeText: { color: "#2E7D32", fontWeight: "700", fontSize: 13 },
   profileBtn: { width: 52, height: 52, borderRadius: 26, backgroundColor: "#E8F5E9", alignItems: "center", justifyContent: "center" },
-  langWrap: { marginTop: 10, marginBottom: 4 },
-  langPill: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 22, borderWidth: 1.5, borderColor: "#D6CFC2", backgroundColor: "#FFFFFF" },
-  langText: { fontSize: 16, fontWeight: "600", color: COLORS.text },
-  micArea: { alignItems: "center", justifyContent: "center", paddingVertical: 28 },
+  micArea: { alignItems: "center", justifyContent: "center", paddingVertical: 36 },
   pulseRing: { position: "absolute", width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.micPulse },
   micBtn: {
     width: 140, height: 140, borderRadius: 70, backgroundColor: COLORS.mic,
