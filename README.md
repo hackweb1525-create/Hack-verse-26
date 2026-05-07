@@ -14,6 +14,16 @@ Farmers in rural areas often face challenges in identifying crop diseases, acces
 
 FarmAssist AI provides a multilingual voice-first platform that enables farmers to diagnose crop diseases and receive actionable agricultural guidance instantly.
 
+📈 Real-World Impact
+
+FarmAssist AI helps farmers by:
+
+Reducing crop losses
+Improving accessibility to agricultural knowledge
+Breaking language barriers
+Providing instant agricultural assistance
+Supporting better farming decisions
+
 solution our tool gives : ## Features
 
 - 🌱 Crop Disease Detection
