@@ -41,7 +41,7 @@ const FEATURES: {
   { key: "fertilizer", label: "Fertilizer Guide", hint: "Voice chat", color: "#795548", icon: "sprout", route: "/fertilizer" },
   { key: "weather", label: "Weather", hint: "5-Day forecast", color: "#0288D1", icon: "weather-partly-cloudy", route: "/weather" },
   { key: "calculator", label: "Smart Calculator", hint: "Crop suggest", color: "#F57C00", icon: "calculator-variant", route: "/calculator" },
-  { key: "market", label: "Market", hint: "Sell direct", color: "#388E3C", icon: "storefront", url: "https://farm-link-chat.lovable.app/" },
+  { key: "market", label: "Market", hint: "Sell direct", color: "#388E3C", icon: "storefront", url: process.env.EXPO_PUBLIC_MARKET_URL || "https://farm-link-chat.lovable.app/" },
 ];
 
 const GREETINGS: Record<LangCode, (name: string) => string> = {
