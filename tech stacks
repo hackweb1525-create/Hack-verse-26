@@ -1,0 +1,29 @@
+🛠️ Tech Stack
+Frontend
+React Native / FlutterFlow / Adalo
+Backend
+Python
+Flask API
+Firebase
+AI & Machine Learning
+TensorFlow
+MobileNetV2
+OpenAI Whisper
+APIs
+OpenWeatherMap API
+Text-to-Speech API
+Database
+Firebase Realtime Database
+JSON-based Agricultural Knowledge Base
+
+🎬 Demo Workflow
+Farmer opens app
+Speaks in native language
+Uploads crop image
+AI predicts disease
+System provides:
+Disease name
+Confidence score
+Fertilizer guidance
+Voice response
+Weather alert
