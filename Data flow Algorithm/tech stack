@@ -1,0 +1,78 @@
+## System Workflow
+
+Farmer Input (Voice/Image)
+↓
+Speech-to-Text / Image Processing
+↓
+AI Model Prediction
+↓
+Agricultural Knowledge Retrieval
+↓
+Voice/Text Response Output
+
+
+                    ┌──────────────────────────┐
+                    │      Farmer/User         │
+                    │  (Voice / Image Input)   │
+                    └────────────┬─────────────┘
+                                 │
+                                 ▼
+                 ┌────────────────────────────┐
+                 │     Frontend Mobile App    │
+                 │ (FlutterFlow / Adalo UI)   │
+                 └────────────┬───────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+
+┌────────────────┐  ┌──────────────────┐  ┌────────────────────┐
+│ Voice Pipeline │  │ Image Processing │  │ External Data APIs │
+└──────┬─────────┘  └────────┬─────────┘  └─────────┬──────────┘
+       │                     │                      │
+       ▼                     ▼                      ▼
+
+┌────────────────┐  ┌──────────────────┐  ┌────────────────────┐
+│ Whisper STT    │  │ Image Preprocess │  │ Weather API        │
+│ Speech-to-Text │  │ Resize/Normalize │  │ Govt Scheme Data   │
+└──────┬─────────┘  └────────┬─────────┘  └─────────┬──────────┘
+       │                     │                      │
+       ▼                     ▼                      ▼
+
+┌────────────────┐  ┌──────────────────┐  ┌────────────────────┐
+│ Intent         │  │ MobileNetV2 CNN  │  │ Rule-Based Filters │
+│ Classification │  │ Disease Detection│  │ Recommendation Sys │
+└──────┬─────────┘  └────────┬─────────┘  └─────────┬──────────┘
+       │                     │                      │
+       └─────────────┬───────┴──────────────┬───────┘
+                     │                      │
+                     ▼                      ▼
+
+          ┌─────────────────────────────────────┐
+          │ Agricultural Knowledge Base         │
+          │ - Disease Solutions                 │
+          │ - Fertilizer Guidance               │
+          │ - Crop Recommendations              │
+          │ - Govt Schemes                      │
+          └────────────────┬────────────────────┘
+                           │
+                           ▼
+
+          ┌─────────────────────────────────────┐
+          │ Response Generation Engine          │
+          │ (Text + Voice Output Generation)    │
+          └────────────────┬────────────────────┘
+                           │
+                           ▼
+
+          ┌─────────────────────────────────────┐
+          │ Text-to-Speech (TTS) System         │
+          │ Multilingual Voice Output           │
+          └────────────────┬────────────────────┘
+                           │
+                           ▼
+
+               ┌────────────────────────┐
+               │ Farmer Receives Result │
+               │ Voice + Text Guidance  │
+               └────────────────────────┘
