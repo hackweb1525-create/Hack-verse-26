@@ -1,0 +1,32 @@
+< PLAN > Plan>
+Save /app/image_testing.md (mandated by integration playbook)
+Update backend/.env with EMERGENT_LLM_KEY
+Install backend deps (already have emergentintegrations) — verify
+Install frontend deps: expo-speech, expo-image-picker, expo-location, axios, @react-native-async-storage/async-storage
+Build backend server.py with endpoints:
+POST /api/disease/detect (Gemini vision)
+POST /api/fertilizer/chat (Gemini text)
+POST /api/calculator/recommend (Gemini reasoning)
+POST /api/translate (multilingual TTS prep)
+GET /api/weather (MOCKED 5-day)
+GET /api/schemes (MOCKED govt schemes)
+GET /api/seedbanks (MOCKED)
+GET /api/youtube/search (MOCKED video lookup)
+Build frontend (expo-router):
+_layout.tsx (LanguageProvider)
+index.tsx (home — mic + 6 grid + language selector)
+disease.tsx, schemes.tsx, fertilizer.tsx, weather.tsx, calculator.tsx
+Market button → Linking.openURL("https://farm-link-chat.lovable.app/")
+
+
+Features implemented:
+
+🎙️ Pulsating mic + language pill selector + 6 colored feature cards (Disease=Red, Schemes=Blue, Fertilizer=Brown, Weather=SkyBlue, Calculator=Orange, Market=Green)
+Disease Detection (/disease): camera/gallery → Gemini Vision → disease + confidence + 5 step-by-step instructions + organic remedies + video card
+Govt Schemes & Seed Bank (/schemes): 6 verified central schemes (PM-KISAN, PMFBY, KCC, Soil Health, PMKSY, e-NAM) + nearby seed banks list + Google Maps deep-link
+Organic Fertilizer Guide (/fertilizer): multilingual Gemini chat with auto-TTS, persisted in MongoDB, 4 starter prompts
+5-Day Weather (/weather): geolocation + reverse-geocode + day cards with weather icons
+Smart Crop Calculator (/calculator): location + land size + soil + season → Gemini reasoning → 3 suggested crops (yield/water need) + 2 rejected crops with "why not" explanations
+Market: opens https://farm-link-chat.lovable.app/
+Auto Text-to-Speech for all AI replies via expo-speech in user's selected language
+Backend: FastAPI + MongoDB + emergentintegrations. 9 endpoints, all tested 10/10 PASS by testing agent.
