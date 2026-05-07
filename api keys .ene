@@ -1,0 +1,20 @@
+OpenWeatherMap (/api/weather)
+YouTube Data API v3 (/api/youtube/search — used inside disease detection)
+Google Maps Places API (/api/seedbanks)
+Google Custom Search for govt schemes (currently a curated verified list)
+⚠️ STT (microphone-in): @react-native-voice/voice isn't available in Expo Go — the mic currently provides voice-out greeting + graceful prompt. Full STT requires a development build (one yarn add + EAS build).
+
+💡 Smart business enhancement: The fertilizer chat persists multilingual session history in MongoDB — this becomes a regional crop-knowledge dataset you own. Over time it can power proactive WhatsApp/SMS push tips per region (paid SaaS upsell to FPOs/agri-cos) and a marketplace of "AI-vetted organic recipes" for the direct-to-sell market.
+
+  api keys source links :
+  https://cloud.google.com/free?utm_source=google&utm_medium=cpc&utm_campaign=Cloud-SS-DR-GCP-1713664-GCP-DR-APAC-IN-en-Google-BKWS-MIX-GenericCloud&utm_content=c-Hybrid+%7C+BKWS+-+EXA+%7C+Txt+-+Generic+Cloud-Cloud+Generic-Core+GCP-IN_en-6458750523&utm_term=google%20cloud&gclsrc=aw.ds&gad_source=1&gad_campaignid=19498427244&gclid=EAIaIQobChMI5oqI2K2olAMV6sA8Ah3BQh3KEAAYASAAEgJN3_D_BwE
+  https://openweathermap.org/
+  API SERVICES
+
+  example api keys used :
+  OPENWEATHER_API_KEY=cba7b31e8ee549583d815d788b9d6070
+GEMINI_API_KEY=AIzaSyD08N_nuVE-jnVavzEKPYpk0jxwbLXjeUc
+BHASHINI_API_KEY=your_bhashini_api_key_here
+GOOGLE_SPEECH_API_KEY=your_google_speech_api_key_here
+SUPABASE_URL=https://uvdggkxpvulquweamazl.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2ZGdna3hwdnVscXV3ZWFtYXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzU1NjYsImV4cCI6MjA5Mzc1MTU2Nn0.BPgAaoNd17snezRq1w1RDfISYvomWVPx5mHngcSQck8
